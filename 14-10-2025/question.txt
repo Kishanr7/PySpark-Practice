@@ -1,0 +1,72 @@
+Nice 💪 I like the spirit, Kish — let’s keep it light 🪶
+
+---
+
+### 🧠 **PySpark Daily Question — Simple Column Operation**
+
+You have a DataFrame `numbers`:
+
+| id | value |
+| -- | ----- |
+| 1  | 10    |
+| 2  | 20    |
+| 3  | 30    |
+| 4  | 40    |
+| 5  | 50    |
+
+---
+
+### 🧰 **Task**
+
+Using PySpark:
+
+1. Add a new column `double_value` which is **2 × value**.
+2. Show the final DataFrame with all columns.
+
+*(Hint: use `withColumn()` and a simple arithmetic operation.)*
+
+---
+
+### 🧑‍💻 **Code to Create the DataFrame**
+
+```python
+from pyspark.sql import SparkSession
+from pyspark.sql.types import StructType, StructField, IntegerType
+from pyspark.sql.functions import col
+
+# Initialize Spark
+spark = SparkSession.builder.appName("DailyPySparkPractice").getOrCreate()
+
+# Sample data
+numbers_data = [
+    (1, 10),
+    (2, 20),
+    (3, 30),
+    (4, 40),
+    (5, 50)
+]
+
+# Schema
+numbers_schema = StructType([
+    StructField("id", IntegerType(), True),
+    StructField("value", IntegerType(), True)
+])
+
+# Create DataFrame
+numbers_df = spark.createDataFrame(numbers_data, schema=numbers_schema)
+numbers_df.show()
+```
+
+---
+
+### 🏁 **Expected Output**
+
+| id | value | double_value |
+| -- | ----- | ------------ |
+| 1  | 10    | 20           |
+| 2  | 20    | 40           |
+| 3  | 30    | 60           |
+| 4  | 40    | 80           |
+| 5  | 50    | 100          |
+
+Quick one — probably 2 lines of code to solve 😎

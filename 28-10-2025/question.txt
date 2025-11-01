@@ -1,0 +1,65 @@
+Let’s gooo, Kish! 🔥 Here’s your **spicier PySpark daily**—`groupBy + avg` with a tiny window twist.
+
+---
+
+### 🧠 PySpark Daily — Dept Averages + Top-2 per Dept (with ties)
+
+You have an `employees` DataFrame.
+
+#### Task
+
+1. Compute **average salary per department** (`dept_avg`).
+2. Add `pct_diff_from_dept_avg = ((salary - dept_avg) / dept_avg) * 100`.
+3. Within each department, **rank employees by salary (desc)** using `dense_rank` (so ties share rank).
+4. Return only the **top 2 ranks per department**.
+5. Show columns: `department, name, salary, dept_avg, pct_diff_from_dept_avg, rank`
+   and order by `department ASC, rank ASC, salary DESC`.
+
+💡 Hints:
+
+* `groupBy("department").agg(avg("salary"))` or a window `avg("salary").over(Window.partitionBy("department"))`.
+* Use `dense_rank().over(Window.partitionBy("department").orderBy(col("salary").desc()))`.
+* Round `dept_avg` and `pct_diff_from_dept_avg` for clean display.
+
+---
+
+### 🧑‍💻 Code to Create the DataFrame
+
+```python
+from pyspark.sql import SparkSession
+from pyspark.sql.types import StructType, StructField, IntegerType, StringType
+
+# Initialize Spark
+spark = SparkSession.builder.appName("DailyPySparkPractice").getOrCreate()
+
+# Sample data
+employees_data = [
+    (1,  "Alice Johnson",  "IT",    85000),
+    (2,  "Carol White",    "IT",    90000),
+    (3,  "Ethan Kumar",    "IT",    78000),
+    (4,  "Isha Verma",     "IT",    90000),  # tie on purpose
+    (5,  "John Doe",       "HR",    50000),
+    (6,  "David Black",    "HR",    48000),
+    (7,  "Nina Kapoor",    "HR",    52000),
+    (8,  "Bob Smith",      "Sales", 62000),
+    (9,  "Emma Brown",     "Sales", 75000),
+    (10, "Liam Davis",     "Sales", 75000),  # tie on purpose
+    (11, "Mia Chen",       "Sales", 68000)
+]
+
+# Schema
+employees_schema = StructType([
+    StructField("emp_id", IntegerType(), True),
+    StructField("name", StringType(), True),
+    StructField("department", StringType(), True),
+    StructField("salary", IntegerType(), True)
+])
+
+# Create DataFrame
+employees_df = spark.createDataFrame(employees_data, schema=employees_schema)
+employees_df.show(truncate=False)
+```
+
+---
+
+Want me to check your solution afterward or share a clean reference solution when you’re done?

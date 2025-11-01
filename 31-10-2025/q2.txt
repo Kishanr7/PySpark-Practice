@@ -1,0 +1,90 @@
+My bad, Kish — here’s **today’s PySpark daily** right now (with DataFrame code included). 🔥
+
+---
+
+# 🧩 Problem — Orders vs Refunds: Net Revenue & Monthly Top-K
+
+You have two tables: `orders` and `refunds`.
+Compute **net revenue per product per month** and find the **top 2 products each month** by net revenue (ties share rank).
+
+### 🎯 Tasks
+
+1. Create a column `order_month = date_format(order_date, 'yyyy-MM')`.
+2. Compute per `(order_month, product)`:
+
+   * `gross_revenue = sum(quantity * price)`
+   * `total_refund = sum(refund_amount)` (join refunds; if none, treat as 0)
+   * `net_revenue = gross_revenue - total_refund`
+3. Within each `order_month`, **dense-rank** products by `net_revenue` (desc) and keep **rank ≤ 2**.
+4. Output columns (sorted by `order_month`, `rank`, `net_revenue` desc):
+   `order_month, product, gross_revenue, total_refund, net_revenue, rank`.
+
+---
+
+## 🧑‍💻 DataFrame Creation Code
+
+```python
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DoubleType
+
+spark = SparkSession.builder.appName("DailyPySparkPractice").getOrCreate()
+
+# ----- Orders -----
+orders_data = [
+    # order_id, order_date, product, quantity, price
+    ("o1", "2025-09-28", "Phone",     2, 600.0),
+    ("o2", "2025-09-30", "Laptop",    1, 1200.0),
+    ("o3", "2025-10-01", "Phone",     1, 620.0),
+    ("o4", "2025-10-02", "Headset",   3, 80.0),
+    ("o5", "2025-10-05", "Laptop",    2, 1150.0),
+    ("o6", "2025-10-07", "Mouse",     5, 25.0),
+    ("o7", "2025-10-12", "Phone",     2, 610.0),
+    ("o8", "2025-10-18", "Headset",   1, 85.0),
+    ("o9", "2025-10-25", "Keyboard",  2, 70.0),
+    ("o10","2025-11-01", "Laptop",    1, 1180.0),
+    ("o11","2025-11-03", "Phone",     1, 605.0),
+]
+
+orders_schema = StructType([
+    StructField("order_id", StringType(), True),
+    StructField("order_date", StringType(), True),
+    StructField("product", StringType(), True),
+    StructField("quantity", IntegerType(), True),
+    StructField("price", DoubleType(), True),
+])
+
+orders_df = spark.createDataFrame(orders_data, schema=orders_schema) \
+    .withColumn("order_date", F.to_date("order_date"))
+
+# ----- Refunds -----
+refunds_data = [
+    # refund_id, order_id, refund_amount
+    ("r1", "o5", 200.0),     # partial refund on Laptop order
+    ("r2", "o7", 100.0),     # partial refund on Phone order
+    ("r3", "o10", 50.0),     # partial refund on Laptop (Nov)
+]
+
+refunds_schema = StructType([
+    StructField("refund_id", StringType(), True),
+    StructField("order_id", StringType(), True),
+    StructField("refund_amount", DoubleType(), True),
+])
+
+refunds_df = spark.createDataFrame(refunds_data, schema=refunds_schema)
+
+orders_df.show(truncate=False)
+refunds_df.show(truncate=False)
+```
+
+---
+
+## 🧠 Hints
+
+* Join refunds with orders on `order_id` using **left join**; use `coalesce(refund_amount, 0.0)`.
+* Revenue per row = `quantity * price`.
+* Use `date_format(order_date, "yyyy-MM")` to get `order_month`.
+* Aggregate with `groupBy("order_month", "product")`.
+* Rank with `dense_rank().over(Window.partitionBy("order_month").orderBy(F.desc("net_revenue"), F.asc("product")))`.
+
+If you want, I can also share the **expected output** once you’re done (or right now).

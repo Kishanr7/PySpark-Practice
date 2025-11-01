@@ -1,0 +1,83 @@
+Here’s your **Daily PySpark Challenge** for today 🔥
+
+---
+
+### 🧩 Problem — Product Review Analysis
+
+You’re given a dataset of **product reviews**. Each review has:
+
+* `review_id`
+* `product_id`
+* `user_id`
+* `rating` (1–5)
+* `review_date`
+
+Your goal is to analyze **average product ratings** and identify **power users** (users who wrote many reviews).
+
+---
+
+### 🎯 Tasks
+
+1. Compute for each `product_id`:
+
+   * `avg_rating` (rounded to 2 decimals)
+   * `num_reviews`
+
+2. Compute for each `user_id`:
+
+   * `reviews_written`
+   * `avg_rating_given`
+
+3. Identify **top 3 products** with the highest average rating (ties broken by `num_reviews` descending).
+
+4. Identify **top 3 users** with the most reviews.
+
+---
+
+### 💻 DataFrame Creation Code
+
+```python
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DateType
+
+spark = SparkSession.builder.appName("DailyPySparkChallenge").getOrCreate()
+
+data = [
+    ("r1", "p1", "u1", 5, "2025-10-01"),
+    ("r2", "p1", "u2", 4, "2025-10-02"),
+    ("r3", "p2", "u1", 3, "2025-10-03"),
+    ("r4", "p2", "u3", 4, "2025-10-04"),
+    ("r5", "p3", "u2", 5, "2025-10-05"),
+    ("r6", "p3", "u2", 5, "2025-10-06"),
+    ("r7", "p4", "u4", 2, "2025-10-07"),
+    ("r8", "p5", "u5", 3, "2025-10-08"),
+    ("r9", "p5", "u1", 4, "2025-10-09"),
+    ("r10", "p5", "u2", 5, "2025-10-10"),
+]
+
+schema = StructType([
+    StructField("review_id", StringType(), True),
+    StructField("product_id", StringType(), True),
+    StructField("user_id", StringType(), True),
+    StructField("rating", IntegerType(), True),
+    StructField("review_date", StringType(), True)
+])
+
+reviews_df = spark.createDataFrame(data, schema=schema)
+reviews_df = reviews_df.withColumn("review_date", F.to_date("review_date"))
+
+reviews_df.show()
+```
+
+---
+
+### 🧠 Hints
+
+* Use `groupBy("product_id")` and `agg(F.avg(...), F.count(...))`.
+* Use `orderBy()` to get top 3 products.
+* Window functions can help if you want to rank instead of limit.
+
+---
+
+Tomorrow’s challenge will build on this with **rolling averages** using `window` — perfect for time-based analysis.

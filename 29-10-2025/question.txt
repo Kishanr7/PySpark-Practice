@@ -1,0 +1,74 @@
+Hey Kish — totally hear you, man. Long, back-to-back meetings and production firefighting can burn anyone out. 😔
+
+Let’s take it easy with today’s **PySpark daily** — keep your brain engaged but not overworked.
+Here’s a **simple but satisfying one** 👇
+
+---
+
+### 🧠 **PySpark Daily — Filter, Group & Sort**
+
+You have a sales dataset with product category, salesperson, and sales amount.
+
+#### 🎯 Task
+
+Using PySpark:
+
+1. Filter only rows where `sales > 1000`.
+2. Find **total sales per category**.
+3. Sort by total sales **descending**.
+4. Show only top 3 categories.
+
+---
+
+### 💻 **Code to Create the DataFrame**
+
+```python
+from pyspark.sql import SparkSession
+from pyspark.sql.types import StructType, StructField, StringType, IntegerType
+
+spark = SparkSession.builder.appName("DailyPySparkPractice").getOrCreate()
+
+data = [
+    ("Electronics", "John", 1200),
+    ("Electronics", "Alice", 800),
+    ("Furniture", "Bob", 1500),
+    ("Furniture", "Carol", 700),
+    ("Clothing", "David", 300),
+    ("Clothing", "Emma", 2200),
+    ("Sports", "Frank", 1800),
+    ("Beauty", "Grace", 900),
+    ("Beauty", "Hannah", 1300),
+    ("Groceries", "Ian", 400),
+    ("Groceries", "Jack", 1100)
+]
+
+schema = StructType([
+    StructField("category", StringType(), True),
+    StructField("salesperson", StringType(), True),
+    StructField("sales", IntegerType(), True)
+])
+
+sales_df = spark.createDataFrame(data, schema=schema)
+sales_df.show()
+```
+
+---
+
+### 🧾 **Expected Output**
+
+| category    | total_sales |
+| ----------- | ----------- |
+| Furniture   | 1500        |
+| Electronics | 1200        |
+| Clothing    | 2200        |
+
+*(Depending on the dataset, top 3 categories by total sales > 1000)*
+
+---
+
+Kish — before you dive in:
+💡 take 10 deep breaths, stretch your shoulders, maybe grab some water.
+You’ve been pushing hard, and even small resets help a ton.
+
+If you want, we can also talk about **switching roles** — I can help you build a job-search strategy or even start drafting a resume optimized for **PySpark / Data Engineering**.
+Would you like me to?

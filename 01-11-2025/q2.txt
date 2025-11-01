@@ -1,0 +1,78 @@
+Awesome — here’s **Challenge 2 (Window Functions)** 🔥
+
+---
+
+# 🧩 Challenge 2 — Rolling Metrics & Daily Top Stores
+
+You have raw transaction data with `store_id`, `txn_date`, and `amount`.
+Compute rolling metrics per store and rank stores per day.
+
+## 🎯 Tasks
+
+1. Compute **daily_revenue** per `(store_id, txn_date)`.
+2. For each `store_id` (ordered by date):
+
+   * `prev_day_revenue` using `lag()`.
+   * `growth_pct` = `((daily_revenue - prev_day_revenue) / prev_day_revenue) * 100` (null when prev is null).
+   * **3-day rolling sum** of `daily_revenue` (current day included).
+3. For each `txn_date`, **dense-rank** stores by `daily_revenue` (desc) and keep **top 2**.
+4. Final output columns, sorted by `txn_date`, `rank`, `store_id`:
+   `txn_date, store_id, daily_revenue, prev_day_revenue, growth_pct, rolling_3d_sum, rank`.
+
+---
+
+## 💻 DataFrame Creation Code
+
+```python
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+from pyspark.sql.window import Window
+from pyspark.sql.types import StructType, StructField, StringType, DoubleType
+
+spark = SparkSession.builder.appName("DailyPySparkPractice").getOrCreate()
+
+# Raw transactions (multiple per day per store)
+data = [
+    ("S1", "2025-10-01", 200.0),
+    ("S1", "2025-10-01", 150.0),
+    ("S1", "2025-10-02", 500.0),
+    ("S1", "2025-10-03", 300.0),
+    ("S1", "2025-10-04", 250.0),
+
+    ("S2", "2025-10-01", 400.0),
+    ("S2", "2025-10-02", 100.0),
+    ("S2", "2025-10-03", 600.0),
+    ("S2", "2025-10-04", 100.0),
+
+    ("S3", "2025-10-01", 50.0),
+    ("S3", "2025-10-02", 800.0),
+    ("S3", "2025-10-03", 120.0),
+    ("S3", "2025-10-04", 900.0),
+]
+
+schema = StructType([
+    StructField("store_id", StringType(), True),
+    StructField("txn_date", StringType(), True),
+    StructField("amount",   DoubleType(), True)
+])
+
+txns_df = spark.createDataFrame(data, schema=schema) \
+    .withColumn("txn_date", F.to_date("txn_date"))
+
+txns_df.show()
+```
+
+---
+
+## 💡 Hints
+
+* Daily revenue: `groupBy("store_id","txn_date").agg(F.sum("amount").alias("daily_revenue"))`
+* Per-store window: `w_store = Window.partitionBy("store_id").orderBy("txn_date")`
+
+  * `lag("daily_revenue", 1).over(w_store)`
+  * Rolling 3 days: `rowsBetween(-2, 0)` → `F.sum("daily_revenue").over(w_store.rowsBetween(-2, 0))`
+* Per-day ranking: `w_day = Window.partitionBy("txn_date").orderBy(F.desc("daily_revenue"), F.asc("store_id"))`
+
+  * `dense_rank().over(w_day)`
+
+If you want, I can share the **expected output** once you run it (or right now). Say the word.

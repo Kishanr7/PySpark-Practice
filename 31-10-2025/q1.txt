@@ -1,0 +1,76 @@
+Here’s your Daily PySpark Challenge for today 🔥
+
+🧩 Problem — Employee Salary Insights
+
+You are given employee salary data containing:
+
+emp_id
+
+department
+
+salary
+
+join_date
+
+Your goal is to analyze department-level salary stats and identify top earners.
+
+🎯 Tasks
+
+For each department, calculate:
+
+avg_salary (rounded to 2 decimals)
+
+min_salary
+
+max_salary
+
+num_employees
+
+Identify top 2 highest-paid employees per department using a window function.
+
+Filter departments where avg_salary > 60000.
+
+💻 DataFrame Creation Code
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+from pyspark.sql.window import Window
+from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DateType
+
+spark = SparkSession.builder.appName("DailyPySparkChallenge").getOrCreate()
+
+data = [
+    ("E01", "HR", 55000, "2022-03-10"),
+    ("E02", "HR", 60000, "2021-06-15"),
+    ("E03", "Finance", 75000, "2020-01-12"),
+    ("E04", "Finance", 82000, "2022-11-20"),
+    ("E05", "Finance", 66000, "2021-09-25"),
+    ("E06", "IT", 95000, "2020-05-01"),
+    ("E07", "IT", 87000, "2023-02-11"),
+    ("E08", "IT", 72000, "2024-04-18"),
+    ("E09", "Marketing", 45000, "2023-07-30"),
+    ("E10", "Marketing", 50000, "2022-12-22"),
+]
+
+schema = StructType([
+    StructField("emp_id", StringType(), True),
+    StructField("department", StringType(), True),
+    StructField("salary", IntegerType(), True),
+    StructField("join_date", StringType(), True)
+])
+
+emp_df = spark.createDataFrame(data, schema=schema)
+emp_df = emp_df.withColumn("join_date", F.to_date("join_date"))
+
+emp_df.show()
+
+🧠 Hints
+
+Use groupBy("department").agg(...) for department stats.
+
+Use Window.partitionBy("department").orderBy(F.desc("salary")) to find top earners.
+
+Use row_number() to rank employees.
+
+Finally, apply filter(F.col("avg_salary") > 60000) to get top departments.
+
+Tomorrow’s challenge will extend this with yearly salary growth using window lag() 🚀

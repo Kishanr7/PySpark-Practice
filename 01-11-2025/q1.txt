@@ -1,0 +1,61 @@
+Let’s gooo, Kish! 🌞🔥
+Welcome back — time to crush your **3 PySpark challenges** today.
+We’ll start light and then level up gradually 👇
+
+---
+
+## 🧩 **Challenge 1 — Filter & Aggregate Warm-up**
+
+### 🎯 Task
+
+You have a `students` DataFrame with their scores in multiple subjects.
+Find:
+
+1. The students who scored **above 80 in all subjects**.
+2. The **average score per subject**.
+
+---
+
+### 💻 **DataFrame Code**
+
+```python
+from pyspark.sql import SparkSession
+from pyspark.sql.types import StructType, StructField, StringType, IntegerType
+
+spark = SparkSession.builder.appName("DailyPySparkPractice").getOrCreate()
+
+data = [
+    ("S1", "John", 85, 90, 88),
+    ("S2", "Alice", 70, 95, 92),
+    ("S3", "Bob", 82, 85, 80),
+    ("S4", "Carol", 78, 82, 89),
+    ("S5", "David", 90, 91, 94)
+]
+
+schema = StructType([
+    StructField("student_id", StringType(), True),
+    StructField("name", StringType(), True),
+    StructField("math", IntegerType(), True),
+    StructField("science", IntegerType(), True),
+    StructField("english", IntegerType(), True)
+])
+
+students_df = spark.createDataFrame(data, schema=schema)
+students_df.show()
+```
+
+---
+
+### 💡 **Hints**
+
+* Use `filter()` with conditions on all three columns.
+* For averages, use:
+
+  ```python
+  from pyspark.sql import functions as F
+  students_df.agg(F.avg("math"), F.avg("science"), F.avg("english")).show()
+  ```
+
+---
+
+When you finish this one, say **“next”**, and I’ll give you Challenge 2 (a window-function one). 🚀

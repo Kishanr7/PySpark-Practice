@@ -1,0 +1,39 @@
+Here’s your **💻 PySpark daily practice question** for today:
+
+---
+
+### 🧠 **PySpark Practice Question — Window Functions & Ranking**
+
+You have a DataFrame `sales` with the following schema:
+
+| region | salesperson | sales_amount | date       |
+| ------ | ----------- | ------------ | ---------- |
+| East   | A           | 1200         | 2025-10-01 |
+| East   | B           | 900          | 2025-10-01 |
+| West   | C           | 1500         | 2025-10-01 |
+| West   | D           | 700          | 2025-10-02 |
+| East   | A           | 1100         | 2025-10-02 |
+| West   | C           | 1000         | 2025-10-02 |
+
+---
+
+### 🧰 **Task**
+
+Using PySpark:
+
+1. Partition the data by `region`.
+2. Rank the salespeople within each region based on `sales_amount` **in descending order**.
+3. Select only the **top salesperson per region for each date**.
+4. Output should include `region`, `salesperson`, `sales_amount`, `date`, and their rank.
+
+---
+
+### 💡 *Hints*
+
+* Use `pyspark.sql.window.Window` to define partitions and ordering.
+* Use `rank()` or `dense_rank()` from `pyspark.sql.functions`.
+* Filter the DataFrame to include only rows where rank = 1.
+
+---
+
+Would you like me to also give you the **PySpark code to generate this `sales` DataFrame** for testing? (so you can focus on writing the logic part 💪)

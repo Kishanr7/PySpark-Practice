@@ -1,0 +1,48 @@
+Here’s a **daily PySpark practice question** you can work on today 👇
+
+---
+
+### 🧠 **PySpark Practice Question — Joins & Aggregations**
+
+You are given two DataFrames:
+
+* **`orders`**
+
+  | order_id | customer_id | amount | order_date |
+  | -------- | ----------- | ------ | ---------- |
+  | 1        | 101         | 250    | 2025-10-01 |
+  | 2        | 102         | 300    | 2025-10-01 |
+  | 3        | 101         | 450    | 2025-10-02 |
+  | 4        | 103         | 200    | 2025-10-03 |
+
+* **`customers`**
+
+  | customer_id | name      | city      |
+  | ----------- | --------- | --------- |
+  | 101         | John Doe  | Mumbai    |
+  | 102         | Alice Roy | Delhi     |
+  | 103         | Bob Smith | Bangalore |
+
+---
+
+### 🧰 **Task**
+
+Using PySpark:
+
+1. Join the two DataFrames on `customer_id`.
+2. Calculate the **total order amount per customer**.
+3. Sort the result in **descending order of total amount**.
+4. Display the top 2 customers.
+
+---
+
+### 💡 *Hints*
+
+* Use `join()` to combine DataFrames.
+* Use `groupBy()` and `agg(sum())` for aggregation.
+* Use `orderBy()` with `desc()` for sorting.
+* Use `limit()` to get the top 2.
+
+---
+
+Would you like me to give **increasing difficulty** (e.g., intermediate or advanced transformations like window functions or UDFs) for tomorrow’s question?
