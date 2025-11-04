@@ -1,0 +1,44 @@
+🧠 PySpark Daily Challenge — Window Functions
+
+Task:
+For each department, find the top 2 highest-paid employees.
+If multiple employees have the same salary, rank them alphabetically by name.
+
+🧩 Setup — Create the DataFrame
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, row_number
+from pyspark.sql.window import Window
+
+spark = SparkSession.builder.appName("DailyPySparkChallenge").getOrCreate()
+
+data = [
+    ("Alice", "HR", 60000),
+    ("Bob", "HR", 65000),
+    ("Charlie", "HR", 60000),
+    ("David", "IT", 75000),
+    ("Eve", "IT", 72000),
+    ("Frank", "IT", 75000),
+    ("Grace", "Finance", 80000),
+    ("Heidi", "Finance", 85000),
+    ("Ivan", "Finance", 85000),
+    ("Judy", "Finance", 78000)
+]
+
+columns = ["employee_name", "department", "salary"]
+employees_df = spark.createDataFrame(data, columns)
+employees_df.show()
+
+🧮 Your Task
+
+Using PySpark window functions:
+
+Rank employees within each department by salary (highest first).
+
+In case of a tie, order alphabetically by employee name.
+
+Return only the top 2 employees per department.
+
+Expected columns:
+department, employee_name, salary, rank
+
+Would you like tomorrow’s question to focus on joins, aggregations, or Spark SQL queries?
