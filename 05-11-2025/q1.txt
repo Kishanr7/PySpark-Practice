@@ -1,0 +1,53 @@
+Here’s your **Daily PySpark Question** for today (kept light and focused). 🌱
+
+---
+
+## 🧩 **Problem — Product Sales by Region**
+
+You have a sales dataset with `region`, `salesperson`, `product`, `units_sold`, and `price_per_unit`.
+
+### 🎯 **Tasks**
+
+1. Compute total `revenue` per `(region, product)` (where `revenue = units_sold × price_per_unit`).
+2. Find the **top 1 product** by revenue per region.
+3. Display `region`, `product`, `total_revenue`, and `rank`.
+
+---
+
+### 💻 **DataFrame Creation Code**
+
+```python
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+from pyspark.sql.window import Window
+
+spark = SparkSession.builder.appName("DailyPySparkQuestion").getOrCreate()
+
+data = [
+    ("North", "Alice", "Laptop", 5, 1200.0),
+    ("North", "Bob", "Mouse", 20, 25.0),
+    ("North", "Alice", "Monitor", 3, 300.0),
+    ("South", "Carol", "Phone", 4, 800.0),
+    ("South", "Dan", "Laptop", 2, 1100.0),
+    ("South", "Carol", "Headset", 10, 100.0),
+    ("East", "Eve", "Laptop", 3, 1300.0),
+    ("East", "Frank", "Mouse", 15, 20.0),
+    ("East", "Eve", "Monitor", 2, 400.0),
+]
+
+columns = ["region", "salesperson", "product", "units_sold", "price_per_unit"]
+sales_df = spark.createDataFrame(data, columns)
+sales_df.show()
+```
+
+---
+
+🧠 **Hint:**
+
+* Compute `total_revenue` using a new column.
+* Use `groupBy("region", "product")` and `agg(sum("total_revenue"))`.
+* Apply a **window with `dense_rank()`** to get the top 1 product per region by revenue.
+
+---
+
+Would you like me to send tomorrow’s one around **7 PM IST** as usual (only if you haven’t already solved one)?
