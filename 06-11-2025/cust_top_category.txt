@@ -1,0 +1,70 @@
+Locked in your daily at 7 PM IST. ✅
+
+# Daily PySpark — Customer Top Category (Difficulty: Easy–Medium)
+
+## Task
+
+Given a transactions DataFrame with columns:
+
+* `cust_id`, `order_id`, `order_date` (yyyy-MM-dd), `category`, `amount` (Double)
+
+Compute each customer’s **top-spend category**:
+
+1. Aggregate total `amount` per `(cust_id, category)`.
+2. For each `cust_id`, pick the category with the **highest total**; if there’s a tie, pick the **alphabetically smallest** category.
+3. Output: `cust_id, top_category, total_spent`.
+
+## DataFrame creation (only)
+
+```python
+from pyspark.sql import SparkSession
+from pyspark.sql.types import StructType, StructField, StringType, DoubleType
+from pyspark.sql import functions as F
+from pyspark.sql.window import Window
+
+spark = SparkSession.builder.appName("DailyPySparkQuestion").getOrCreate()
+
+data = [
+    ("C1","O1","2025-10-01","Electronics",1200.0),
+    ("C1","O2","2025-10-05","Accessories",  50.0),
+    ("C1","O9","2025-10-06","Electronics", 300.0),
+
+    ("C2","O3","2025-10-03","Electronics", 800.0),
+    ("C2","O4","2025-10-04","Accessories", 200.0),
+    ("C2","O10","2025-10-08","Accessories",150.0),
+
+    ("C3","O5","2025-10-06","Home",         90.0),
+    ("C3","O6","2025-10-07","Accessories",  30.0),
+    ("C3","O11","2025-10-09","Home",        60.0),
+
+    ("C4","O7","2025-10-02","Electronics",1100.0),
+    ("C4","O8","2025-10-08","Electronics", 300.0),
+    # Tie on purpose between Accessories (1400) and Electronics (1400)
+    ("C4","O12","2025-10-10","Accessories",1400.0),
+]
+
+schema = StructType([
+    StructField("cust_id",     StringType(), True),
+    StructField("order_id",    StringType(), True),
+    StructField("order_date",  StringType(), True),
+    StructField("category",    StringType(), True),
+    StructField("amount",      DoubleType(), True),
+])
+
+txns_df = spark.createDataFrame(data, schema)
+```
+
+## Expected output
+
+```
++-------+-------------+-----------+
+|cust_id| top_category|total_spent|
++-------+-------------+-----------+
+|    C1 | Electronics |     1500.0|
+|    C2 | Electronics |      800.0|
+|    C3 | Home        |      150.0|
+|    C4 | Accessories |     1400.0|  <-- tie broken alphabetically
++-------+-------------+-----------+
+```
+
+Want another one after this, Kish, or you’ll do this first and then ping me?

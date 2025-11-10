@@ -1,0 +1,70 @@
+Done — I’ll send it daily at 10 AM IST.
+
+# Daily PySpark — Order Gaps per Customer (Difficulty: Medium)
+
+## Task
+
+Given orders with columns:
+
+* `cust_id` (string), `order_id` (string), `order_date` (yyyy-MM-dd), `amount` (double)
+
+For each order, compute:
+
+1. `prev_order_date` = previous order date for the same `cust_id` (chronological),
+2. `gap_days` = days between `order_date` and `prev_order_date`,
+3. For each `cust_id`, keep only the **latest two** orders by `order_date` (if only one exists, keep one).
+   Output columns in this order: `cust_id, order_id, order_date, prev_order_date, gap_days, amount`.
+
+## DataFrame creation (only)
+
+```python
+from pyspark.sql import SparkSession
+from pyspark.sql.types import StructType, StructField, StringType, DoubleType
+from pyspark.sql import functions as F
+from pyspark.sql.window import Window
+
+spark = SparkSession.builder.appName("DailyPySparkQuestion").getOrCreate()
+
+data = [
+    ("C1","O1001","2025-09-28",250.0),
+    ("C1","O1010","2025-10-05",300.0),
+    ("C1","O1020","2025-10-20",180.0),
+
+    ("C2","O2001","2025-10-01",800.0),
+    ("C2","O2005","2025-10-04",200.0),
+
+    ("C3","O3001","2025-10-02",120.0),
+
+    ("C4","O4001","2025-10-01",1100.0),
+    ("C4","O4010","2025-10-08",300.0),
+    ("C4","O4020","2025-10-12",400.0),
+]
+
+schema = StructType([
+    StructField("cust_id",    StringType(), True),
+    StructField("order_id",   StringType(), True),
+    StructField("order_date", StringType(), True),
+    StructField("amount",     DoubleType(), True),
+])
+
+orders_df = (spark.createDataFrame(data, schema)
+             .withColumn("order_date", F.to_date("order_date")))
+```
+
+## Expected output
+
+```
++-------+-------+----------+---------------+--------+------+
+|cust_id|order_id|order_date|prev_order_date|gap_days|amount|
++-------+-------+----------+---------------+--------+------+
+|    C1 | O1020 |2025-10-20|     2025-10-05|      15| 180.0|
+|    C1 | O1010 |2025-10-05|     2025-09-28|       7| 300.0|
+|    C2 | O2005 |2025-10-04|     2025-10-01|       3| 200.0|
+|    C2 | O2001 |2025-10-01|           null|    null| 800.0|
+|    C3 | O3001 |2025-10-02|           null|    null| 120.0|
+|    C4 | O4020 |2025-10-12|     2025-10-08|       4| 400.0|
+|    C4 | O4010 |2025-10-08|     2025-10-01|       7| 300.0|
++-------+-------+----------+---------------+--------+------+
+```
+
+No step-by-step hints. Go build it.
