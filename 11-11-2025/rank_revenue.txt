@@ -1,0 +1,63 @@
+# Daily PySpark — Top Product per Region (Difficulty: Easy–Medium)
+
+## Task
+
+You have sales data with columns:
+
+* `region` (string), `salesperson` (string), `product` (string), `units_sold` (int), `price_per_unit` (double)
+
+For each `region`, compute the **top product by total revenue**.
+Revenue is the **sum of `units_sold * price_per_unit`**.
+Tie-breaker: pick the **alphabetically smallest** product.
+Output: `region, product, total_revenue, rank` (where rank is 1 for the top product per region).
+
+## DataFrame creation (only)
+
+```python
+from pyspark.sql import SparkSession
+from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DoubleType
+
+spark = SparkSession.builder.appName("DailyPySparkQuestion").getOrCreate()
+
+data = [
+    ("North", "Alice", "Laptop", 5, 1200.0),
+    ("North", "Bob",   "Mouse", 20,   25.0),
+    ("North", "Alice", "Monitor", 3,  300.0),
+
+    ("South", "Carol", "Phone", 4, 800.0),
+    ("South", "Dan",   "Laptop", 2, 1100.0),
+    ("South", "Carol", "Headset", 10, 100.0),
+
+    ("East",  "Eve",   "Laptop", 3, 1300.0),
+    ("East",  "Frank", "Mouse", 15,  20.0),
+    ("East",  "Eve",   "Monitor", 2, 400.0),
+]
+
+schema = StructType([
+    StructField("region", StringType(), True),
+    StructField("salesperson", StringType(), True),
+    StructField("product", StringType(), True),
+    StructField("units_sold", IntegerType(), True),
+    StructField("price_per_unit", DoubleType(), True),
+])
+
+sales_df = spark.createDataFrame(data, schema)
+```
+
+## Strict hints (no step-by-step code)
+
+* Aggregate `total_revenue` at `(region, product)` level using **sum of (units * price)**.
+* Window: partition by `region`, order by `total_revenue DESC, product ASC`.
+* Choose **row_number = 1** and select required columns.
+
+## Expected output
+
+```
++------+-------+-------------+----+
+|region|product|total_revenue|rank|
++------+-------+-------------+----+
+|  East| Laptop|       3900.0|   1|
+| North| Laptop|       6000.0|   1|
+| South|  Phone|       3200.0|   1|
++------+-------+-------------+----+
+```
