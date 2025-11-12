@@ -1,0 +1,64 @@
+Daily PySpark — Customer Purchase Insights
+
+Difficulty: Medium
+
+Task
+
+You have a dataset of customer transactions with columns:
+
+customer_id (string)
+
+transaction_id (string)
+
+product (string)
+
+category (string)
+
+amount (double)
+
+Goal:
+For each customer_id, find their highest spending category and the total spent in that category.
+Tie-breaker: pick the category that is alphabetically first if total spent is equal.
+Output: customer_id, top_category, total_spent, rank (rank = 1 for the top category per customer).
+
+DataFrame creation
+from pyspark.sql import SparkSession
+from pyspark.sql.types import StructType, StructField, StringType, DoubleType
+
+spark = SparkSession.builder.appName("DailyPySparkQuestion").getOrCreate()
+
+data = [
+    ("C001", "T001", "Laptop", "Electronics", 1200.0),
+    ("C001", "T002", "Mouse", "Electronics", 25.0),
+    ("C001", "T003", "Notebook", "Stationery", 15.0),
+
+    ("C002", "T004", "Chair", "Furniture", 150.0),
+    ("C002", "T005", "Desk", "Furniture", 350.0),
+    ("C002", "T006", "Pen", "Stationery", 5.0),
+
+    ("C003", "T007", "Phone", "Electronics", 800.0),
+    ("C003", "T008", "Headset", "Electronics", 100.0),
+    ("C003", "T009", "Notebook", "Stationery", 20.0),
+]
+
+schema = StructType([
+    StructField("customer_id", StringType(), True),
+    StructField("transaction_id", StringType(), True),
+    StructField("product", StringType(), True),
+    StructField("category", StringType(), True),
+    StructField("amount", DoubleType(), True),
+])
+
+transactions_df = spark.createDataFrame(data, schema)
+
+Expected output
++-----------+------------+-----------+----+
+|customer_id|top_category|total_spent|rank|
++-----------+------------+-----------+----+
+|       C001| Electronics|     1225.0|   1|
+|       C002|   Furniture|      500.0|   1|
+|       C003| Electronics|      900.0|   1|
++-----------+------------+-----------+----+
+
+
+High-level hint: Aggregate by (customer_id, category) → sum amount → window partition by customer_id and rank by total_spent DESC, category ASC.
