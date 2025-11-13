@@ -1,0 +1,55 @@
+Daily PySpark — Top‑2 Spending Categories
+Difficulty: Hard
+Task (brief)
+For each customer_id, compute their top 2 categories by total spend. If totals tie, pick categories in alphabetical order. Return:
+customer_id, top1_category, top1_spent, top2_category, top2_spent, share_top1
+(where share_top1 = top1_spent / total_spent_all rounded to 2 decimals).
+High-level hint: aggregate by (customer_id, category) then order/rank per customer (tie-breaker: category ascending).
+
+DataFrame creation
+from pyspark.sql import SparkSession
+from pyspark.sql.types import StructType, StructField, StringType, DoubleType
+
+spark = SparkSession.builder.appName("DailyPySparkQuestion").getOrCreate()
+
+data = [
+    ("C001", "T001", "Laptop",      "Electronics", "2025-09-01", 1200.0),
+    ("C001", "T002", "Mouse",       "Electronics", "2025-09-10",   25.0),
+    ("C001", "T003", "Notebook",    "Stationery",  "2025-09-12",   15.0),
+    ("C001", "T010", "Printer",     "Office",      "2025-09-15",  100.0),
+    ("C001", "T011", "Desk",        "Furniture",   "2025-09-20",  300.0),
+
+    ("C002", "T004", "Chair",       "Furniture",   "2025-09-05",  150.0),
+    ("C002", "T005", "Desk",        "Furniture",   "2025-09-06",  350.0),
+    ("C002", "T006", "Pen",         "Stationery",  "2025-09-07",    5.0),
+    ("C002", "T012", "Lamp",        "Home",        "2025-09-08",   50.0),
+
+    ("C003", "T007", "Phone",       "Electronics", "2025-09-02",  800.0),
+    ("C003", "T008", "Headset",     "Electronics", "2025-09-03",  100.0),
+    ("C003", "T009", "Notebook",    "Stationery",  "2025-09-04",   20.0),
+    ("C003", "T013", "Cabinet",     "Furniture",   "2025-09-10",  900.0),
+]
+
+schema = StructType([
+    StructField("customer_id", StringType(), True),
+    StructField("transaction_id", StringType(), True),
+    StructField("product", StringType(), True),
+    StructField("category", StringType(), True),
+    StructField("transaction_date", StringType(), True),
+    StructField("amount", DoubleType(), True),
+])
+
+transactions_df = spark.createDataFrame(data, schema)
+
+
+Expected output
++-----------+----------------+-----------+----------------+-----------+-----------+
+|customer_id|top1_category   |top1_spent |top2_category   |top2_spent |share_top1 |
++-----------+----------------+-----------+----------------+-----------+-----------+
+|C001       |Electronics     |1225.0     |Furniture       |300.0      |0.75       |
+|C002       |Furniture       |500.0      |Home            |50.0       |0.90       |
+|C003       |Electronics     |900.0      |Furniture       |900.0      |0.49       |
++-----------+----------------+-----------+----------------+-----------+-----------+
+
+
+No step‑by‑step solution included.
