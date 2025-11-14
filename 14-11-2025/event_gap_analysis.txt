@@ -1,0 +1,41 @@
+PySpark Question — Event Gap Analysis
+
+Difficulty: Easy–Medium
+Dataset: Same events_df you already created.
+
+Task
+
+For each id, compute:
+
+prev_event_ts → the previous event timestamp for the same id (chronologically).
+
+gap_seconds → difference between event_ts and prev_event_ts in seconds.
+
+is_gap_large → "Y" if gap_seconds > 300 seconds (5 minutes), otherwise "N".
+
+Keep all rows, ordered by id and event_ts.
+
+Final Output Columns
+id, event_ts, event_type, value, prev_event_ts, gap_seconds, is_gap_large
+
+Expected Output
+
+You must generate this output from the same data you already loaded, so expected output is shown below:
+
++---+-------------------+----------+-----+-------------------+-----------+------------+
+|id |event_ts           |event_type|value|prev_event_ts      |gap_seconds|is_gap_large|
++---+-------------------+----------+-----+-------------------+-----------+------------+
+|a1 |2025-10-01 09:00:00|open      |10   |NULL               |NULL       |N           |
+|a1 |2025-10-01 09:05:00|click     |20   |2025-10-01 09:00:00|300        |N           |
+|a1 |2025-10-01 09:05:00|click     |25   |2025-10-01 09:05:00|0          |N           |
+|a2 |2025-10-02 11:00:00|open      |5    |NULL               |NULL       |N           |
+|a2 |2025-10-02 11:30:00|open      |7    |2025-10-02 11:00:00|1800       |Y           |
+|a3 |2025-10-03 08:00:00|open      |1    |NULL               |NULL       |N           |
++---+-------------------+----------+-----+-------------------+-----------+------------+
+
+High-Level Hint
+
+Use windowing with lag, then compute time difference, then derive a boolean flag.
+No more hints.
+
+If you want a Medium+ or Hard version next (like sessionization or event dedupe with versioning), say “push harder.”

@@ -1,0 +1,47 @@
+Daily PySpark — Keep Latest Record per Key
+
+Difficulty: Easy
+
+Task (brief)
+
+You have event records that may contain duplicates for the same id. For each id, keep only the latest record (based on event_ts). Return the full row for that latest record.
+
+High-level hint: use a window partitioned by id and pick the most recent row per partition.
+
+DataFrame creation (only)
+from pyspark.sql import SparkSession
+from pyspark.sql.types import StructType, StructField, StringType, TimestampType, IntegerType
+from pyspark.sql import functions as F
+
+spark = SparkSession.builder.appName("DailyPySpark_Easy").getOrCreate()
+
+data = [
+    ("a1", "2025-10-01 09:00:00", "open",  10),
+    ("a1", "2025-10-01 09:05:00", "click", 20),
+    ("a1", "2025-10-01 09:05:00", "click", 25),  # duplicate ts, different payload
+    ("a2", "2025-10-02 11:00:00", "open",  5),
+    ("a2", "2025-10-02 11:30:00", "open",  7),
+    ("a3", "2025-10-03 08:00:00", "open",  1),
+]
+
+schema = StructType([
+    StructField("id", StringType(), True),
+    StructField("event_ts", StringType(), True),   # treat as timestamp in your solution
+    StructField("event_type", StringType(), True),
+    StructField("value", IntegerType(), True),
+])
+
+events_df = spark.createDataFrame(data, schema) \
+                 .withColumn("event_ts", F.to_timestamp("event_ts"))
+
+Expected output
+
+(Keep one row per id; for ties on event_ts keep the row with the highest value.)
+
++---+-------------------+----------+-----+
+|id |event_ts           |event_type|value|
++---+-------------------+----------+-----+
+|a1 |2025-10-01 09:05:00|click     |  25 |
+|a2 |2025-10-02 11:30:00|open      |   7 |
+|a3 |2025-10-03 08:00:00|open      |   1 |
++---+-------------------+----------+-----+
