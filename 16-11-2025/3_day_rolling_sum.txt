@@ -1,0 +1,58 @@
+Topic: Rolling 3-Day Sum per User (Time-based window)
+
+Difficulty: Medium
+
+1) DataFrame creation code
+from pyspark.sql import SparkSession
+from pyspark.sql.types import StructType, StructField, StringType, IntegerType
+from pyspark.sql import functions as F
+
+spark = SparkSession.builder.appName("DailyPySpark_Rolling3Day").getOrCreate()
+
+data = [
+    ("u1", "2025-11-10", 100),
+    ("u1", "2025-11-11",  50),
+    ("u1", "2025-11-13", 200),
+    ("u1", "2025-11-15", 100),
+
+    ("u2", "2025-11-10",  80),
+    ("u2", "2025-11-12",  20),
+    ("u2", "2025-11-16",  40),
+]
+
+schema = StructType([
+    StructField("user_id", StringType(), True),
+    StructField("event_date", StringType(), True),  # yyyy-MM-dd
+    StructField("amount", IntegerType(), True),
+])
+
+df = (spark.createDataFrame(data, schema)
+          .withColumn("event_date", F.to_date("event_date")))
+
+2) Task
+
+For each (user_id, event_date), compute a rolling 3-day sum of amount, including the current day and the previous 2 calendar days.
+
+Return:
+
+user_id, event_date, amount, rolling_3d_sum
+
+3) Expected output
++--------+-----------+------+--------------+
+|user_id |event_date |amount|rolling_3d_sum|
++--------+-----------+------+--------------+
+|u1      |2025-11-10 |100   |100           |
+|u1      |2025-11-11 |50    |150           |  -- 10th + 11th
+|u1      |2025-11-13 |200   |250           |  -- 11th + 13th
+|u1      |2025-11-15 |100   |300           |  -- 13th + 15th
+
+|u2      |2025-11-10 |80    |80            |
+|u2      |2025-11-12 |20    |100           |  -- 10th + 12th
+|u2      |2025-11-16 |40    |40            |  -- only 16th in last 3 days
++--------+-----------+------+--------------+
+
+4) High-level hint (no steps)
+
+You need a time-based window (days), not just rowsBetween.
+
+Partition by user_id, order by event_date, and bound the window over a range of 2 days before the current row.
