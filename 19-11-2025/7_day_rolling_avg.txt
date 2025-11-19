@@ -1,0 +1,45 @@
+Difficulty: Medium
+Problem:
+
+You have a dataset of daily sales. For each store_id, calculate the 7-day rolling average of sales_amount, including the current day and previous 6 calendar days.
+
+1️⃣ DataFrame Creation Code
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, to_date
+from datetime import date
+
+spark = SparkSession.builder.getOrCreate()
+
+data = [
+    ("s1", "2025-11-12", 100),
+    ("s1", "2025-11-13", 200),
+    ("s1", "2025-11-15", 300),
+    ("s1", "2025-11-16", 400),
+    ("s2", "2025-11-12", 500),
+    ("s2", "2025-11-13", 600),
+    ("s2", "2025-11-14", 700),
+    ("s2", "2025-11-16", 800),
+]
+
+columns = ["store_id", "date", "sales_amount"]
+
+sales_df = spark.createDataFrame(data, columns).withColumn("date", to_date(col("date")))
+sales_df.show()
+
+2️⃣ Expected Output
+store_id	date	sales_amount	rolling_7d_avg
+s1	2025-11-12	100	100.0
+s1	2025-11-13	200	150.0
+s1	2025-11-15	300	200.0
+s1	2025-11-16	400	300.0
+s2	2025-11-12	500	500.0
+s2	2025-11-13	600	550.0
+s2	2025-11-14	700	600.0
+s2	2025-11-16	800	700.0
+3️⃣ High-Level Hint
+
+Use a window partitioned by store_id and ordered by date.
+
+Consider rangeBetween for a time-based rolling window.
+
+Do you want me to generate a second variant with top-N per store and tie-breaking for added practice?
