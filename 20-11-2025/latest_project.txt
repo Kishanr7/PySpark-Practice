@@ -1,0 +1,37 @@
+Difficulty: Medium
+Problem:
+
+You have a dataset of employees and their project assignments. For each employee_id, find the latest project they worked on, and also include the second-latest project if it exists.
+
+1️⃣ DataFrame Creation Code
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import to_date, col
+
+spark = SparkSession.builder.getOrCreate()
+
+data = [
+    ("e1", "ProjectA", "2025-11-01"),
+    ("e1", "ProjectB", "2025-11-05"),
+    ("e1", "ProjectC", "2025-11-10"),
+    ("e2", "ProjectX", "2025-11-03"),
+    ("e2", "ProjectY", "2025-11-07"),
+    ("e3", "ProjectZ", "2025-11-08"),
+]
+
+columns = ["employee_id", "project_name", "assignment_date"]
+
+df = spark.createDataFrame(data, columns).withColumn("assignment_date", to_date(col("assignment_date")))
+df.show()
+
+2️⃣ Expected Output
+employee_id	project_name	assignment_date	rank
+e1	ProjectC	2025-11-10	1
+e1	ProjectB	2025-11-05	2
+e2	ProjectY	2025-11-07	1
+e2	ProjectX	2025-11-03	2
+e3	ProjectZ	2025-11-08	1
+3️⃣ High-Level Hint
+
+Use a window partitioned by employee_id and ordered by assignment_date descending.
+
+Assign a rank to each project per employee and filter for top 2.
