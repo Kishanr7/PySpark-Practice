@@ -1,0 +1,46 @@
+PySpark Question – 2025-11-22
+
+Difficulty: Medium
+
+Problem: For a company’s employee database, find the second highest salary in each department.
+
+1️⃣ DataFrame Creation Code:
+
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+
+spark = SparkSession.builder.getOrCreate()
+
+data = [
+    ("Alice", "HR", 50000),
+    ("Bob", "HR", 60000),
+    ("Charlie", "HR", 55000),
+    ("David", "IT", 70000),
+    ("Eve", "IT", 72000),
+    ("Frank", "IT", 71000),
+    ("Grace", "Finance", 65000),
+    ("Heidi", "Finance", 64000),
+]
+
+columns = ["employee_name", "department", "salary"]
+
+df = spark.createDataFrame(data, columns)
+df.show(truncate=False)
+
+
+2️⃣ Expected Output:
+
++-------------+----------+------+
+|employee_name|department|salary|
++-------------+----------+------+
+|Charlie      |HR        |55000 |
+|Frank        |IT        |71000 |
+|Heidi        |Finance   |64000 |
++-------------+----------+------+
+
+
+Hints:
+
+Consider using window functions partitioned by department.
+
+Think about ranking functions that allow you to identify top N salaries.
