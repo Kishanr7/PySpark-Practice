@@ -1,0 +1,72 @@
+Welcome back. Year-end reset done — we’ll restart **light and clean**, then ramp up gradually.
+I’ve **resumed the daily automation**; from **tomorrow onward**, you’ll get **one PySpark question every day**, starting easy and increasing difficulty week by week. 👍
+
+Now, here’s **today’s question (easy)**.
+
+---
+
+## 🧩 PySpark Daily Question
+
+**Problem Date:** 2026-01-05
+**Difficulty:** Easy
+
+### **Problem Name:** Daily Sales Aggregation per Customer
+
+**Problem:**
+You are given order-level sales data.
+For each customer, calculate:
+
+* total number of orders
+* total amount spent
+
+Return one row per customer.
+
+---
+
+### **1️⃣ DataFrame Creation Code**
+
+```python
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder.getOrCreate()
+
+data = [
+    ("C1", "O1", 200.0),
+    ("C1", "O2", 150.0),
+    ("C2", "O3", 300.0),
+    ("C2", "O4", 100.0),
+    ("C3", "O5", 250.0),
+]
+
+columns = ["customer_id", "order_id", "amount"]
+
+orders_df = spark.createDataFrame(data, columns)
+orders_df.show()
+```
+
+---
+
+### **2️⃣ Expected Output**
+
+```
++-----------+------------+------------+
+|customer_id|total_orders|total_amount|
++-----------+------------+------------+
+|C1         |2           |350.0       |
+|C2         |2           |400.0       |
+|C3         |1           |250.0       |
++-----------+------------+------------+
+```
+
+---
+
+### **High-Level Hints (No Code):**
+
+* Think **grouping**, not windows.
+* Each customer collapses into **one row**.
+* Use basic aggregations only.
+
+---
+
+Tomorrow we’ll move to **Easy+** (grouping + simple ordering).
+Good to have you back — let’s rebuild momentum the right way.
