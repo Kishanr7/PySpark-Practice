@@ -1,0 +1,48 @@
+🧩 PySpark Daily Question
+
+Problem Date: 2026-01-06
+Difficulty: Easy+
+
+Problem Name: Latest Order per Customer
+
+Problem:
+You are given order data with customer IDs, order IDs, order dates, and amounts.
+For each customer, return only their latest order (based on order_date).
+If multiple orders fall on the same latest date, keep any one.
+
+1️⃣ DataFrame Creation Code
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder.getOrCreate()
+
+data = [
+    ("C1", "O1", "2026-01-01", 200.0),
+    ("C1", "O2", "2026-01-03", 150.0),
+    ("C2", "O3", "2026-01-02", 300.0),
+    ("C2", "O4", "2026-01-02", 100.0),
+    ("C3", "O5", "2026-01-01", 250.0),
+]
+
+columns = ["customer_id", "order_id", "order_date", "amount"]
+
+orders_df = spark.createDataFrame(data, columns)
+orders_df.show(truncate=False)
+
+2️⃣ Expected Output
++-----------+--------+------------+------+
+|customer_id|order_id|order_date  |amount|
++-----------+--------+------------+------+
+|C1         |O2      |2026-01-03  |150.0 |
+|C2         |O3      |2026-01-02  |300.0 |
+|C3         |O5      |2026-01-01  |250.0 |
++-----------+--------+------------+------+
+
+High-Level Hints (Minimal):
+
+You must compare rows within each customer.
+
+Think about ordering before filtering.
+
+The solution should scale beyond one row per customer.
+
+Tomorrow we move to Medium‑ (multi-condition windows).
