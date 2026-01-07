@@ -1,0 +1,57 @@
+🧩 PySpark Daily Question
+Problem Date: 2026-01-07
+Difficulty: Medium‑
+
+Problem Name: Consecutive Active Days per User
+Problem:
+You are given daily user activity data.
+For each user, find the maximum number of consecutive days they were active.
+Return one row per user with their longest active streak.
+
+1️⃣ DataFrame Creation Code
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder.getOrCreate()
+
+data = [
+    ("U1", "2026-01-01"),
+    ("U1", "2026-01-02"),
+    ("U1", "2026-01-04"),
+    ("U1", "2026-01-05"),
+    ("U1", "2026-01-06"),
+    ("U2", "2026-01-01"),
+    ("U2", "2026-01-03"),
+    ("U2", "2026-01-04"),
+    ("U3", "2026-01-02"),
+]
+
+columns = ["user_id", "activity_date"]
+
+activity_df = spark.createDataFrame(data, columns)
+activity_df.show(truncate=False)
+
+
+2️⃣ Expected Output
++-------+---------------------+
+|user_id|max_consecutive_days |
++-------+---------------------+
+|U1     |3                    |
+|U2     |2                    |
+|U3     |1                    |
++-------+---------------------+
+
+
+High-Level Hints (Minimal):
+
+
+Order matters within each user.
+
+
+You need to detect breaks in continuity.
+
+
+Think window functions + grouping, not joins.
+
+
+
+Tomorrow moves to Medium (conditional aggregation + windows).
