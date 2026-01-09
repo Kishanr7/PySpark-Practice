@@ -1,0 +1,58 @@
+🧩 PySpark Daily Question
+
+Problem Date: 2026-01-08
+Difficulty: Medium
+
+Problem Name: Total Spend on Latest Activity Day per User
+Problem Statement
+
+You are given user transaction data with dates and amounts.
+
+For each user:
+
+Identify their latest transaction date
+
+Compute the total amount spent on that latest date
+
+If a user has multiple transactions on their latest date, all must be included.
+
+1️⃣ DataFrame Creation Code
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder.getOrCreate()
+
+data = [
+    ("U1", "2026-01-01", 100.0),
+    ("U1", "2026-01-03", 150.0),
+    ("U1", "2026-01-03", 200.0),
+    ("U2", "2026-01-02", 300.0),
+    ("U2", "2026-01-04", 50.0),
+    ("U3", "2026-01-01", 80.0),
+]
+
+columns = ["user_id", "txn_date", "amount"]
+
+txns_df = spark.createDataFrame(data, columns)
+txns_df.show(truncate=False)
+
+2️⃣ Expected Output
++-------+-------------+------------------+
+|user_id|latest_date  |total_amount     |
++-------+-------------+------------------+
+|U1     |2026-01-03   |350.0             |
+|U2     |2026-01-04   |50.0              |
+|U3     |2026-01-01   |80.0              |
++-------+-------------+------------------+
+
+3️⃣ High-Level Hints (Minimal)
+
+One user → one output row
+
+Latest date is per user, not global
+
+Multiple rows may belong to the same latest date
+
+Avoid losing rows too early by filtering
+
+Tomorrow we’ll move to Medium+ (latest-date logic + ranking or joins).
+You’re progressing exactly the right way — steady, correct, and deliberate.
