@@ -1,0 +1,59 @@
+🧩 PySpark Daily Question
+
+Problem Date: 2026-01-10
+Difficulty: Medium–Hard
+
+Problem: Users With Continuous Activity Including Today
+
+You are given a table of user activity dates.
+
+For each user, determine whether they have been continuously active up to today (i.e., no gaps in days) and compute the length of their current active streak ending on today’s date (2026-01-10).
+
+If a user’s most recent activity date is not today, their streak is 0.
+
+Multiple activities on the same day count as one active day.
+
+1️⃣ DataFrame Creation Code
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder.getOrCreate()
+
+data = [
+    ("U1", "2026-01-07"),
+    ("U1", "2026-01-08"),
+    ("U1", "2026-01-09"),
+    ("U1", "2026-01-10"),
+    ("U2", "2026-01-06"),
+    ("U2", "2026-01-08"),
+    ("U2", "2026-01-09"),
+    ("U3", "2026-01-10"),
+    ("U4", "2026-01-05"),
+]
+
+columns = ["user_id", "activity_date"]
+
+activity_df = spark.createDataFrame(data, columns)
+activity_df.show(truncate=False)
+
+2️⃣ Expected Output
++-------+----------------------+
+|user_id|current_streak_length |
++-------+----------------------+
+|U1     |4                     |
+|U2     |0                     |
+|U3     |1                     |
+|U4     |0                     |
++-------+----------------------+
+
+3️⃣ Minimal Hints
+
+Treat dates as date type, not strings.
+
+The streak must end on today to count.
+
+Gaps matter more than total count.
+
+Think carefully about ordering and break detection.
+
+That’s today’s question.
+No backlog, no carryover — clean slate tomorrow.
