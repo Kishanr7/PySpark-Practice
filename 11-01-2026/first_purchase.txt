@@ -1,0 +1,75 @@
+🧩 PySpark Daily Question
+
+Date: 2026-01-11
+Difficulty: Medium
+
+Problem: First Purchase After Signup
+
+You are given two DataFrames:
+
+users_df: user signup information
+
+orders_df: user purchase history
+
+For each user, find the first order placed on or after their signup date.
+
+Rules:
+
+Ignore orders before signup.
+
+If a user has no valid order, return NULL for order fields.
+
+Assume order_id uniquely identifies an order.
+
+1️⃣ DataFrame Creation Code
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder.getOrCreate()
+
+users_data = [
+    ("U1", "2026-01-01"),
+    ("U2", "2026-01-03"),
+    ("U3", "2026-01-05"),
+    ("U4", "2026-01-07"),
+]
+
+orders_data = [
+    ("O1", "U1", "2025-12-31"),
+    ("O2", "U1", "2026-01-02"),
+    ("O3", "U1", "2026-01-10"),
+    ("O4", "U2", "2026-01-01"),
+    ("O5", "U2", "2026-01-03"),
+    ("O6", "U3", "2026-01-06"),
+]
+
+users_df = spark.createDataFrame(
+    users_data, ["user_id", "signup_date"]
+)
+
+orders_df = spark.createDataFrame(
+    orders_data, ["order_id", "user_id", "order_date"]
+)
+
+users_df.show(truncate=False)
+orders_df.show(truncate=False)
+
+2️⃣ Expected Output
++-------+--------+-----------+
+|user_id|order_id|order_date |
++-------+--------+-----------+
+|U1     |O2      |2026-01-02 |
+|U2     |O5      |2026-01-03 |
+|U3     |O6      |2026-01-06 |
+|U4     |NULL    |NULL       |
++-------+--------+-----------+
+
+3️⃣ Minimal Hints
+
+Dates must be compared after casting.
+
+Think carefully about join type + ordering.
+
+“First” is relative to signup, not absolute time.
+
+That’s today’s question.
+No shortcuts — precision over cleverness.

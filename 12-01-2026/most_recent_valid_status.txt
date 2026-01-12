@@ -1,0 +1,64 @@
+🧩 PySpark Daily Question
+
+Date: 2026-01-12
+Difficulty: Medium → Medium‑Hard
+
+Problem: Most Recent Valid Status per User
+
+You are given a DataFrame that tracks status changes for users over time.
+
+For each user, return their most recent status such that:
+
+The status date is on or before a given reference date
+
+If a user has no valid status, return NULL
+
+Assume:
+
+A user can have multiple status changes on different dates
+
+Dates are inclusive
+
+Reference date = 2026-01-10
+
+1️⃣ DataFrame Creation Code
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder.getOrCreate()
+
+data = [
+    ("U1", "ACTIVE",   "2026-01-01"),
+    ("U1", "INACTIVE", "2026-01-05"),
+    ("U1", "ACTIVE",   "2026-01-12"),
+    ("U2", "ACTIVE",   "2026-01-03"),
+    ("U2", "SUSPENDED","2026-01-08"),
+    ("U3", "ACTIVE",   "2026-01-11"),
+    ("U4", "INACTIVE", "2025-12-31"),
+]
+
+columns = ["user_id", "status", "status_date"]
+
+status_df = spark.createDataFrame(data, columns)
+
+status_df.show(truncate=False)
+
+2️⃣ Expected Output
++-------+----------+-----------+
+|user_id|status    |status_date|
++-------+----------+-----------+
+|U1     |INACTIVE  |2026-01-05 |
+|U2     |SUSPENDED |2026-01-08 |
+|U3     |NULL      |NULL       |
+|U4     |INACTIVE  |2025-12-31 |
++-------+----------+-----------+
+
+3️⃣ Minimal Hints (High‑Level Only)
+
+Filter before ranking
+
+“Most recent” implies ordering
+
+Be careful with users who disappear after filtering
+
+That’s today’s question.
+Precision > cleverness.
