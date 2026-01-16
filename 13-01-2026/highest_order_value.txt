@@ -1,0 +1,52 @@
+🧩 Backlog Catch-Up — Question 1 (Warm-up)
+
+Date: 2026-01-13
+Difficulty: Easy
+
+📌 Problem: Highest Order per Customer
+
+For each customer, return their highest-value order.
+
+Rules:
+
+If multiple orders tie for highest value, return any one
+
+Output must contain exactly one row per customer
+
+1️⃣ DataFrame Creation Code
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+
+spark = SparkSession.builder.getOrCreate()
+
+data = [
+    ("C1", "O1", 200.0),
+    ("C1", "O2", 500.0),
+    ("C1", "O3", 300.0),
+    ("C2", "O4", 100.0),
+    ("C2", "O5", 100.0),
+    ("C3", "O6", 250.0),
+]
+
+orders_df = spark.createDataFrame(
+    data, ["customer_id", "order_id", "amount"]
+)
+
+orders_df.show(truncate=False)
+
+2️⃣ Expected Output
++-----------+--------+------+
+|customer_id|order_id|amount|
++-----------+--------+------+
+|C1         |O2      |500.0 |
+|C2         |O4      |100.0 |
+|C3         |O6      |250.0 |
++-----------+--------+------+
+
+3️⃣ Minimal Hints
+
+This is not a cumulative problem
+
+Ordering inside a partition is enough
+
+Don’t overthink ties

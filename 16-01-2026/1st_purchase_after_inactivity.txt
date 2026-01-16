@@ -1,0 +1,64 @@
+🧠 Backlog Catch-Up — Jan 16 PySpark Question
+
+Date: 2026-01-16
+Difficulty: 🔴 Hard (but controlled) — window + conditional aggregation + NULL safety
+
+📌 Problem: First Purchase After Inactivity
+
+You are given a table of user purchases with dates.
+
+For each user, find the first purchase date after a gap of more than 7 days since their previous purchase.
+
+Rules:
+
+Purchases are ordered by date per user
+
+A “gap” means difference > 7 days
+
+If a user never has such a gap, return NULL
+
+Output must contain exactly one row per user
+
+1️⃣ DataFrame Creation Code
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+
+spark = SparkSession.builder.getOrCreate()
+
+data = [
+    ("U1", "2026-01-01", 100),
+    ("U1", "2026-01-05", 200),
+    ("U1", "2026-01-20", 300),
+    ("U1", "2026-01-22", 150),
+    ("U2", "2026-01-03", 50),
+    ("U2", "2026-01-06", 80),
+    ("U3", "2026-01-01", 120),
+]
+
+purchases_df = (
+    spark.createDataFrame(data, ["user_id", "purchase_date", "amount"])
+         .withColumn("purchase_date", F.to_date("purchase_date"))
+)
+
+purchases_df.show(truncate=False)
+
+2️⃣ Expected Output
++-------+---------------+
+|user_id|purchase_date  |
++-------+---------------+
+|U1     |2026-01-20     |
+|U2     |NULL           |
+|U3     |NULL           |
++-------+---------------+
+
+3️⃣ Minimal High-Level Hints (No Code)
+
+This is a temporal gap detection problem
+
+“After inactivity” means current row depends on previous row
+
+Filtering too early will silently drop users
+
+The answer is not the gap date — it’s the purchase after the gap
+
+Post your solution when ready and I’ll analyze it like before.
