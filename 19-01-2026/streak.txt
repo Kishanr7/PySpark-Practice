@@ -1,0 +1,65 @@
+🧠 Daily PySpark Question — Jan 19
+
+Difficulty: 🟠 Medium
+
+📌 Problem: Longest Consecutive Login Streak per User
+
+You are given a table of user login activity, where each row represents a user logging in on a specific date.
+
+For each user, compute the length of their longest streak of consecutive daily logins.
+
+Rules:
+
+A streak counts only if logins are on consecutive calendar days
+
+Multiple logins on the same day count as one day
+
+Output must contain one row per user
+
+Assume dates are in the same timezone
+
+1️⃣ DataFrame Creation Code
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+
+spark = SparkSession.builder.getOrCreate()
+
+data = [
+    ("U1", "2026-01-01"),
+    ("U1", "2026-01-02"),
+    ("U1", "2026-01-04"),
+    ("U1", "2026-01-05"),
+    ("U1", "2026-01-06"),
+    ("U2", "2026-01-03"),
+    ("U2", "2026-01-05"),
+    ("U2", "2026-01-06"),
+    ("U3", "2026-01-10"),
+]
+
+logins_df = (
+    spark.createDataFrame(data, ["user_id", "login_date"])
+         .withColumn("login_date", F.to_date("login_date"))
+)
+
+logins_df.show(truncate=False)
+
+2️⃣ Expected Output
++-------+----------------------+
+|user_id|longest_login_streak  |
++-------+----------------------+
+|U1     |3                     |
+|U2     |2                     |
+|U3     |1                     |
++-------+----------------------+
+
+3️⃣ Minimal High-Level Hints
+
+De-duplicate logins at the (user, date) level first
+
+Ordering within each user is essential
+
+Look for a way to identify streak boundaries
+
+Avoid iterative or driver-side logic
+
+Automation run complete for Jan 19, 10:00 AM.

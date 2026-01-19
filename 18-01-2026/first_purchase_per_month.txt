@@ -1,0 +1,68 @@
+🧠 Daily PySpark Question — Jan 18
+
+Difficulty: 🟠 Medium–Hard
+
+📌 Problem: First Purchase per User per Month
+
+You are given a table of user purchase transactions with a purchase date and amount.
+
+For each user and each calendar month, find the first purchase made in that month, along with its amount.
+
+Rules:
+
+“First” is determined strictly by purchase_date
+
+Output must contain one row per (user, month)
+
+Month should be represented as yyyy-MM
+
+Assume no two purchases for the same user occur at the exact same timestamp
+
+Use Spark-native transformations only
+
+1️⃣ DataFrame Creation Code
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+
+spark = SparkSession.builder.getOrCreate()
+
+data = [
+    ("U1", "2026-01-02", 100),
+    ("U1", "2026-01-15", 200),
+    ("U1", "2026-02-01", 300),
+    ("U2", "2026-01-05", 50),
+    ("U2", "2026-01-20", 80),
+    ("U2", "2026-02-10", 120),
+    ("U3", "2026-01-01", 60),
+]
+
+purchases_df = (
+    spark.createDataFrame(data, ["user_id", "purchase_date", "amount"])
+         .withColumn("purchase_date", F.to_date("purchase_date"))
+)
+
+purchases_df.show(truncate=False)
+
+2️⃣ Expected Output
++-------+-------+-------------+------+
+|user_id|month  |purchase_date|amount|
++-------+-------+-------------+------+
+|U1     |2026-01|2026-01-02   |100   |
+|U1     |2026-02|2026-02-01   |300   |
+|U2     |2026-01|2026-01-05   |50    |
+|U2     |2026-02|2026-02-10   |120   |
+|U3     |2026-01|2026-01-01   |60    |
++-------+-------+-------------+------+
+
+3️⃣ Minimal High-Level Hints
+
+This is a partitioned ordering problem
+
+Think carefully about what defines the grouping key
+
+The solution should scale cleanly with more data
+
+Avoid unnecessary aggregations that lose row-level detail
+
+That’s today’s question.
+Work through it calmly — this one is meant to rebuild rhythm, not trick you
