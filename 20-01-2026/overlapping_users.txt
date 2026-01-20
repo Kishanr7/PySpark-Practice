@@ -1,0 +1,63 @@
+🧠 Daily PySpark Question — Jan 20
+
+Difficulty: 🟠 Medium–Hard
+
+📌 Problem: Detect Users with Overlapping Sessions
+
+You are given a table of user activity sessions, where each row represents a session with a start and end timestamp.
+
+For each user, determine whether they have at least one pair of overlapping sessions.
+
+Rules:
+
+Two sessions overlap if their time ranges intersect (inclusive)
+
+Sessions belonging to different users should never be compared
+
+Output only users who have overlaps
+
+Return one row per qualifying user with a boolean flag
+
+1️⃣ DataFrame Creation Code
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+
+spark = SparkSession.builder.getOrCreate()
+
+data = [
+    ("U1", "2026-01-01 10:00:00", "2026-01-01 11:00:00"),
+    ("U1", "2026-01-01 10:30:00", "2026-01-01 12:00:00"),
+    ("U1", "2026-01-02 09:00:00", "2026-01-02 10:00:00"),
+    ("U2", "2026-01-03 14:00:00", "2026-01-03 15:00:00"),
+    ("U2", "2026-01-03 15:00:00", "2026-01-03 16:00:00"),
+    ("U3", "2026-01-04 08:00:00", "2026-01-04 09:30:00"),
+    ("U3", "2026-01-04 09:00:00", "2026-01-04 10:00:00"),
+]
+
+sessions_df = (
+    spark.createDataFrame(data, ["user_id", "session_start", "session_end"])
+         .withColumn("session_start", F.to_timestamp("session_start"))
+         .withColumn("session_end", F.to_timestamp("session_end"))
+)
+
+sessions_df.show(truncate=False)
+
+2️⃣ Expected Output
++-------+-------------------+
+|user_id|has_overlap        |
++-------+-------------------+
+|U1     |true               |
+|U3     |true               |
++-------+-------------------+
+
+3️⃣ Minimal High-Level Hints
+
+This is an ordering + comparison problem
+
+Think in terms of previous vs current session
+
+Sorting within each user is mandatory
+
+Avoid self-joins unless absolutely necessary
+
+Automation run complete for Jan 20, 10:00 AM (IST).
