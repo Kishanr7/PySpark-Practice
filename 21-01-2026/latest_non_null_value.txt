@@ -1,0 +1,63 @@
+🧠 Daily PySpark Question — Jan 21
+
+Difficulty: 🔴 Hard
+
+📌 Problem: Find the Most Recent Non-Null Attribute per User
+
+You are given a table of user profile updates. Each row represents a snapshot in time where some attributes may be null.
+
+For each user, determine the latest non-null value of each attribute based on update_ts.
+
+Rules:
+
+Updates are time-ordered per user
+
+Null values mean “no update for this field”
+
+You must carry forward previous known values
+
+Output one row per user with the final resolved values
+
+1️⃣ DataFrame Creation Code
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+
+spark = SparkSession.builder.getOrCreate()
+
+data = [
+    ("U1", "2026-01-01 10:00:00", "John",  None,     "US"),
+    ("U1", "2026-01-02 09:00:00", None,    "M",      None),
+    ("U1", "2026-01-03 08:00:00", None,    None,     "CA"),
+    ("U2", "2026-01-01 11:00:00", "Alice", "F",      "UK"),
+    ("U2", "2026-01-04 12:00:00", None,    None,     None),
+    ("U3", "2026-01-02 15:00:00", None,    "M",      None),
+]
+
+profile_df = (
+    spark.createDataFrame(
+        data,
+        ["user_id", "update_ts", "name", "gender", "country"]
+    )
+    .withColumn("update_ts", F.to_timestamp("update_ts"))
+)
+
+profile_df.show(truncate=False)
+
+2️⃣ Expected Output
++-------+------+--------+--------+
+|user_id|name  |gender  |country |
++-------+------+--------+--------+
+|U1     |John  |M       |CA      |
+|U2     |Alice |F       |UK      |
+|U3     |null  |M       |null    |
++-------+------+--------+--------+
+
+3️⃣ Minimal High-Level Hints
+
+This is a state propagation problem
+
+Ordering within each user is mandatory
+
+Think about window functions that ignore nulls
+
+Avoid joins and UDFs
