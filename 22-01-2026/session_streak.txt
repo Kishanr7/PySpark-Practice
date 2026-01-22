@@ -1,0 +1,63 @@
+🧠 Daily PySpark Question — Jan 22
+
+Difficulty: 🔴 Hard
+
+📌 Problem: Detect Session Streaks per User
+
+You are given a table of user sessions, where each row represents one session with a start and end timestamp.
+
+For each user, identify continuous session streaks, where:
+
+A streak continues if the next session starts within 30 minutes of the previous session’s end
+
+Otherwise, a new streak begins
+
+Your task is to assign a streak_id per session and return all rows with this identifier.
+
+1️⃣ DataFrame Creation Code
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+
+spark = SparkSession.builder.getOrCreate()
+
+data = [
+    ("U1", "2026-01-01 09:00:00", "2026-01-01 09:30:00"),
+    ("U1", "2026-01-01 09:45:00", "2026-01-01 10:15:00"),
+    ("U1", "2026-01-01 11:00:00", "2026-01-01 11:30:00"),
+    ("U2", "2026-01-02 14:00:00", "2026-01-02 14:20:00"),
+    ("U2", "2026-01-02 14:40:00", "2026-01-02 15:00:00"),
+    ("U2", "2026-01-02 16:00:00", "2026-01-02 16:30:00"),
+]
+
+sessions_df = (
+    spark.createDataFrame(
+        data,
+        ["user_id", "session_start", "session_end"]
+    )
+    .withColumn("session_start", F.to_timestamp("session_start"))
+    .withColumn("session_end", F.to_timestamp("session_end"))
+)
+
+sessions_df.show(truncate=False)
+
+2️⃣ Expected Output
++-------+-------------------+-------------------+----------+
+|user_id|session_start      |session_end        |streak_id |
++-------+-------------------+-------------------+----------+
+|U1     |2026-01-01 09:00:00|2026-01-01 09:30:00|1         |
+|U1     |2026-01-01 09:45:00|2026-01-01 10:15:00|1         |
+|U1     |2026-01-01 11:00:00|2026-01-01 11:30:00|2         |
+|U2     |2026-01-02 14:00:00|2026-01-02 14:20:00|1         |
+|U2     |2026-01-02 14:40:00|2026-01-02 15:00:00|1         |
+|U2     |2026-01-02 16:00:00|2026-01-02 16:30:00|2         |
++-------+-------------------+-------------------+----------+
+
+3️⃣ Minimal High-Level Hints
+
+Think in terms of gaps between consecutive rows
+
+Ordering within each user is mandatory
+
+This is a running segmentation problem
+
+Avoid joins and UDFs
