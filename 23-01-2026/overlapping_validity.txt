@@ -1,0 +1,65 @@
+🧠 Daily PySpark Question — Jan 23
+
+Difficulty: 🔴 Hard
+
+📌 Problem: Resolve Overlapping Validity Intervals per User
+
+You are given a table that tracks attribute changes for users.
+Each row represents a value that is valid from start_ts to end_ts.
+
+However:
+
+Intervals may overlap
+
+Later records override earlier ones
+
+For each user, you must produce a timeline of non-overlapping intervals with the correct effective value
+
+Your task is to return a DataFrame with clean, non-overlapping intervals per user, reflecting the latest valid value at any point in time.
+
+1️⃣ DataFrame Creation Code
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+
+spark = SparkSession.builder.getOrCreate()
+
+data = [
+    ("U1", "A", "2026-01-01", "2026-01-10"),
+    ("U1", "B", "2026-01-05", "2026-01-15"),
+    ("U1", "C", "2026-01-15", "2026-01-20"),
+    ("U2", "X", "2026-02-01", "2026-02-10"),
+    ("U2", "Y", "2026-02-05", "2026-02-08"),
+]
+
+df = (
+    spark.createDataFrame(
+        data,
+        ["user_id", "attr_value", "start_date", "end_date"]
+    )
+    .withColumn("start_date", F.to_date("start_date"))
+    .withColumn("end_date", F.to_date("end_date"))
+)
+
+df.show(truncate=False)
+
+2️⃣ Expected Output
++-------+----------+------------+------------+
+|user_id|attr_value|start_date  |end_date    |
++-------+----------+------------+------------+
+|U1     |A         |2026-01-01  |2026-01-04  |
+|U1     |B         |2026-01-05  |2026-01-14  |
+|U1     |C         |2026-01-15  |2026-01-20  |
+|U2     |X         |2026-02-01  |2026-02-04  |
+|U2     |Y         |2026-02-05  |2026-02-08  |
+|U2     |X         |2026-02-09  |2026-02-10  |
++-------+----------+------------+------------+
+
+3️⃣ Minimal High‑Level Hints
+
+This is a temporal override problem
+
+Later rows take precedence over earlier ones
+
+Think in terms of event boundaries
+
+Window functions alone are not sufficient unless combined cleverly
