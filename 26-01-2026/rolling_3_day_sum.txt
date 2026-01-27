@@ -1,0 +1,36 @@
+📅 Problem Date: 2026-01-26
+Problem Name: Rolling 3-Day Sum per User (Medium)
+
+Difficulty: Medium
+
+DataFrame creation code
+data = [
+    ("U1", "2026-01-24", 100),
+    ("U1", "2026-01-25", 200),
+    ("U1", "2026-01-26", 50),
+    ("U2", "2026-01-25", 300),
+    ("U2", "2026-01-26", 100),
+]
+
+df = (
+    spark.createDataFrame(data, ["user_id", "event_date", "amount"])
+         .withColumn("event_date", F.to_date("event_date"))
+)
+
+df.show(truncate=False)
+
+Expected Output
++-------+----------+------+------------------+
+|user_id|event_date|amount|rolling_3_day_sum |
++-------+----------+------+------------------+
+|U1     |2026-01-24|100   |100               |
+|U1     |2026-01-25|200   |300               |
+|U1     |2026-01-26|50    |350               |
+|U2     |2026-01-25|300   |300               |
+|U2     |2026-01-26|100   |400               |
+
+High-level hints
+
+Decide: rows-based vs time-based window
+
+Order is critica
