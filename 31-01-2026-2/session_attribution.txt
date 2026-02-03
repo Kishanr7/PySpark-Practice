@@ -1,0 +1,80 @@
+📅 Problem Date
+
+31 Jan 2026
+
+🧩 Problem Name
+
+Session Attribution with Late Events and Backfill
+
+🔥 Difficulty
+
+Hard
+
+📘 Problem Statement
+
+You are given user events and session start markers.
+Events may arrive late (event_time < ingestion_time).
+
+Your task is to assign each event to the correct session such that:
+
+A session starts at a session_start event
+
+All subsequent events belong to the most recent session_start for that user
+
+Late events must be backfilled into the correct historical session
+
+Events occurring before the first session_start for a user should be excluded
+
+Output one row per event with its resolved session_id
+
+🧪 Input DataFrame (Creation Code)
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+
+spark = SparkSession.builder.getOrCreate()
+
+data = [
+    ("U1", "session_start", "2026-01-01 09:00:00", "2026-01-01 09:01:00"),
+    ("U1", "click",         "2026-01-01 09:05:00", "2026-01-01 09:06:00"),
+    ("U1", "purchase",      "2026-01-01 09:10:00", "2026-01-01 09:30:00"),  # late ingest
+
+    ("U1", "session_start", "2026-01-01 10:00:00", "2026-01-01 10:00:30"),
+    ("U1", "click",         "2026-01-01 10:05:00", "2026-01-01 10:05:10"),
+
+    ("U2", "click",         "2026-01-01 08:00:00", "2026-01-01 08:10:00"),
+    ("U2", "session_start", "2026-01-01 08:30:00", "2026-01-01 08:31:00"),
+    ("U2", "purchase",      "2026-01-01 08:40:00", "2026-01-01 08:41:00"),
+]
+
+df = (
+    spark.createDataFrame(
+        data,
+        ["user_id", "event_type", "event_time", "ingestion_time"]
+    )
+    .withColumn("event_time", F.to_timestamp("event_time"))
+    .withColumn("ingestion_time", F.to_timestamp("ingestion_time"))
+)
+
+📤 Expected Output
++-------+------------+-------------------+----------+
+|user_id|event_type  |event_time         |session_id|
++-------+------------+-------------------+----------+
+|U1     |session_start|2026-01-01 09:00:00|1         |
+|U1     |click        |2026-01-01 09:05:00|1         |
+|U1     |purchase     |2026-01-01 09:10:00|1         |
+|U1     |session_start|2026-01-01 10:00:00|2         |
+|U1     |click        |2026-01-01 10:05:00|2         |
+|U2     |session_start|2026-01-01 08:30:00|1         |
+|U2     |purchase     |2026-01-01 08:40:00|1         |
+
+🧠 High‑Level Hints (minimal)
+
+Ordering must be based on event_time, not ingestion_time
+
+Requires state propagation backward in time
+
+Simple lag() is insufficient
+
+Think in terms of event streams, not batches
+
+This problem tests whether you truly understand event‑time semantics, late data handling, and session attribution — exactly where most Spark candidates fail.

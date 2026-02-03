@@ -1,0 +1,34 @@
+📅 Problem Date: 2026-01-25
+Problem Name: Latest Record per Key (Easy → Medium)
+
+Difficulty: Easy–Medium
+
+DataFrame creation code
+data = [
+    ("U1", "2026-01-20", "ACTIVE"),
+    ("U1", "2026-01-25", "INACTIVE"),
+    ("U2", "2026-01-22", "ACTIVE"),
+    ("U2", "2026-01-24", "SUSPENDED"),
+    ("U3", "2026-01-23", "ACTIVE"),
+]
+
+df = (
+    spark.createDataFrame(data, ["user_id", "status_date", "status"])
+         .withColumn("status_date", F.to_date("status_date"))
+)
+
+df.show(truncate=False)
+
+Expected Output
++-------+----------+---------+
+|user_id|status_date|status  |
++-------+----------+---------+
+|U1     |2026-01-25|INACTIVE |
+|U2     |2026-01-24|SUSPENDED|
+|U3     |2026-01-23|ACTIVE   |
+
+High-level hints
+
+Window ordering matters
+
+Think “latest per user”

@@ -1,0 +1,78 @@
+🧩 Today’s PySpark Interview Question
+📅 Problem Date
+
+31 Jan 2026
+
+🔥 Difficulty
+
+Hard
+
+📘 Problem Name
+
+Top‑K Categories per User with Stable Ties
+
+📘 Problem Statement
+
+You are given user transaction data with categories and amounts.
+
+Your task is to compute, for each user, the top 2 categories ranked by:
+
+Total spend (descending)
+
+If totals tie, earliest transaction date wins
+
+If still tied, order categories alphabetically
+
+Additional rules:
+
+A user may have fewer than 2 categories
+
+Output must contain one row per (user, rank)
+
+Ranking restarts per user
+
+🧪 Input DataFrame (Creation Code)
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+
+spark = SparkSession.builder.getOrCreate()
+
+data = [
+    ("U1", "Books",  100, "2026-01-01"),
+    ("U1", "Books",   50, "2026-01-03"),
+    ("U1", "Games",  150, "2026-01-02"),
+    ("U1", "Music",  150, "2026-01-01"),
+
+    ("U2", "Books",   40, "2026-01-05"),
+    ("U2", "Games",   40, "2026-01-01"),
+    ("U2", "Movies",  20, "2026-01-03"),
+]
+
+df = (
+    spark.createDataFrame(
+        data,
+        ["user_id", "category", "amount", "txn_date"]
+    )
+    .withColumn("txn_date", F.to_date("txn_date"))
+)
+
+📤 Expected Output
++-------+--------+-----+
+|user_id|category|rank |
++-------+--------+-----+
+|U1     |Music   |1    |
+|U1     |Games   |2    |
+|U2     |Games   |1    |
+|U2     |Books   |2    |
+
+🧠 High‑Level Hints (minimal)
+
+Requires aggregation before ranking
+
+Tie‑breaking order matters
+
+Use window functions, not group-level filtering
+
+Avoid hardcoding limit logic
+
+This problem checks whether you can combine aggregation, deterministic ranking, and partitioned logic cleanly — a common failure point in real interviews.

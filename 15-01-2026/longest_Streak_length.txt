@@ -1,0 +1,77 @@
+### 🧠 Backlog Catch-Up — **Jan 15 PySpark Question**
+
+**Date:** **2026-01-15**
+**Difficulty:** 🔶 **Medium-Hard** (sessionization + window semantics)
+
+---
+
+## 📌 Problem: Longest Continuous Login Streak per User
+
+You are given a table of **user login dates**.
+
+For each user, calculate the **length of their longest continuous login streak**.
+
+Rules:
+
+* A streak is **continuous daily logins** (no gaps > 1 day)
+* If a user has only one login → streak length is `1`
+* Output must contain **exactly one row per user**
+* Return **only the streak length**, not the dates
+
+---
+
+## 1️⃣ DataFrame Creation Code
+
+```python
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+
+spark = SparkSession.builder.getOrCreate()
+
+data = [
+    ("U1", "2026-01-01"),
+    ("U1", "2026-01-02"),
+    ("U1", "2026-01-04"),
+    ("U1", "2026-01-05"),
+    ("U1", "2026-01-06"),
+    ("U2", "2026-01-01"),
+    ("U2", "2026-01-03"),
+    ("U2", "2026-01-04"),
+    ("U3", "2026-01-02"),
+]
+
+login_df = (
+    spark.createDataFrame(data, ["user_id", "login_date"])
+         .withColumn("login_date", F.to_date("login_date"))
+)
+
+login_df.show(truncate=False)
+```
+
+---
+
+## 2️⃣ Expected Output
+
+```
++-------+----------------------+
+|user_id|longest_login_streak  |
++-------+----------------------+
+|U1     |3                     |
+|U2     |2                     |
+|U3     |1                     |
++-------+----------------------+
+```
+
+---
+
+## 3️⃣ Minimal High-Level Hints (No Code)
+
+* This is a **sessionization problem**
+* You’ll need to detect **breaks in continuity**
+* Think in terms of **groups of consecutive days**
+* The final answer is a **max over group sizes**
+
+---
+
+This is a **classic top-company interview question** (Meta / Amazon / Uber style).
+Post your solution when ready — I’ll analyze it line by line like before.

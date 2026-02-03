@@ -1,0 +1,94 @@
+📅 Today’s PySpark Interview Question
+🔥 Difficulty Level
+
+Hard
+
+🧩 Problem Name
+
+Session Reconstruction with Out-of-Order and Orphan Events
+
+📘 Problem Statement
+
+You are given a stream of user events with event time and ingestion time.
+Events may arrive out of order, and some events may appear before a session officially starts.
+
+A session:
+
+Starts with a session_start event
+
+Ends when 30 minutes of inactivity occur
+
+Must be reconstructed using event_time, not ingestion_time
+
+Your task is to assign a session_id to each event that belongs to a valid session.
+
+Rules:
+
+Events before the first session_start must be discarded
+
+Late-arriving events must be assigned to the correct session if they fall within the session window
+
+A new session starts either on:
+
+a session_start, or
+
+inactivity gap > 30 minutes
+
+Output must be deterministic and ordered by event_time
+
+🧪 Input DataFrame (Creation Code)
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+
+spark = SparkSession.builder.getOrCreate()
+
+data = [
+    ("U1", "click",         "2026-01-01 08:50:00", "2026-01-01 09:10:00"),
+    ("U1", "session_start", "2026-01-01 09:00:00", "2026-01-01 09:01:00"),
+    ("U1", "click",         "2026-01-01 09:05:00", "2026-01-01 09:06:00"),
+    ("U1", "purchase",      "2026-01-01 09:40:00", "2026-01-01 09:45:00"),
+
+    ("U1", "click",         "2026-01-01 10:20:00", "2026-01-01 10:21:00"),
+    ("U1", "session_start", "2026-01-01 10:25:00", "2026-01-01 10:25:10"),
+    ("U1", "click",         "2026-01-01 10:30:00", "2026-01-01 10:31:00"),
+
+    ("U2", "click",         "2026-01-01 07:50:00", "2026-01-01 08:00:00"),
+    ("U2", "session_start", "2026-01-01 08:00:00", "2026-01-01 08:00:10"),
+    ("U2", "click",         "2026-01-01 08:10:00", "2026-01-01 08:15:00"),
+]
+
+df = (
+    spark.createDataFrame(
+        data,
+        ["user_id", "event_type", "event_time", "ingestion_time"]
+    )
+    .withColumn("event_time", F.to_timestamp("event_time"))
+    .withColumn("ingestion_time", F.to_timestamp("ingestion_time"))
+)
+
+📤 Expected Output
++-------+-------------+-------------------+----------+
+|user_id|event_type   |event_time         |session_id|
++-------+-------------+-------------------+----------+
+|U1     |session_start|2026-01-01 09:00:00|1         |
+|U1     |click        |2026-01-01 09:05:00|1         |
+|U1     |purchase     |2026-01-01 09:40:00|1         |
+|U1     |session_start|2026-01-01 10:25:00|2         |
+|U1     |click        |2026-01-01 10:30:00|2         |
+|U2     |session_start|2026-01-01 08:00:00|1         |
+|U2     |click        |2026-01-01 08:10:00|1         |
+
+🧠 High‑Level Hints (Minimal)
+
+Always reason in event time
+
+Late data should not break session boundaries
+
+You’ll need state across rows
+
+Be careful not to resurrect invalid pre-session events
+
+Window functions alone may not be enough unless used carefully
+
+This question is designed to expose shallow sessionization logic quickly.
+If you can solve it cleanly, you’re operating at senior+ data engineering level

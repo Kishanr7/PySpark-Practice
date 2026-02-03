@@ -1,0 +1,39 @@
+📅 Problem Date: 2026-01-24
+Problem Name: Daily Active Users (Easy)
+
+Difficulty: Easy
+
+DataFrame creation code
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+
+spark = SparkSession.builder.getOrCreate()
+
+data = [
+    ("U1", "2026-01-24"),
+    ("U2", "2026-01-24"),
+    ("U1", "2026-01-25"),
+    ("U3", "2026-01-25"),
+    ("U2", "2026-01-26"),
+]
+
+df = (
+    spark.createDataFrame(data, ["user_id", "event_date"])
+         .withColumn("event_date", F.to_date("event_date"))
+)
+
+df.show(truncate=False)
+
+Expected Output
++----------+------------------+
+|event_date|daily_active_users|
++----------+------------------+
+|2026-01-24|2                 |
+|2026-01-25|2                 |
+|2026-01-26|1                 |
+
+High-level hints
+
+Deduplicate per day
+
+Aggregate at date level

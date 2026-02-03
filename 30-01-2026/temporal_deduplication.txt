@@ -1,0 +1,82 @@
+📅 Problem Date
+
+30 Jan 2026
+
+🧩 Problem Name
+
+Temporal Deduplication with Priority and Gap Collapse
+
+🔥 Difficulty
+
+Hard
+
+📘 Problem Statement
+
+You are given status change records for entities where:
+
+Records may overlap in time
+
+Multiple records can start on the same day
+
+Each record has a priority (higher number = higher priority)
+
+Adjacent intervals with the same final resolved status should be merged
+
+Your task is to produce final, non-overlapping, compressed intervals per entity such that:
+
+At any point in time, the active status is the one with the highest priority
+
+If priorities tie, the latest start_date wins
+
+Resulting intervals with the same status and touching dates must be merged
+
+Open-ended intervals (end_date = NULL) are allowed
+
+🧪 Input DataFrame (Creation Code)
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+
+spark = SparkSession.builder.getOrCreate()
+
+data = [
+    ("E1", "ACTIVE",    1, "2026-01-01", "2026-01-10"),
+    ("E1", "SUSPENDED", 3, "2026-01-05", "2026-01-07"),
+    ("E1", "ACTIVE",    2, "2026-01-07", "2026-01-15"),
+    ("E1", "BLOCKED",   5, "2026-01-12", None),
+
+    ("E2", "ACTIVE",    1, "2026-01-01", "2026-01-03"),
+    ("E2", "ACTIVE",    1, "2026-01-04", "2026-01-06"),
+    ("E2", "INACTIVE",  2, "2026-01-05", "2026-01-08"),
+]
+
+df = (
+    spark.createDataFrame(
+        data,
+        ["entity_id", "status", "priority", "start_date", "end_date"]
+    )
+    .withColumn("start_date", F.to_date("start_date"))
+    .withColumn("end_date", F.to_date("end_date"))
+)
+
+📤 Expected Output
++---------+----------+----------+----------+
+|entity_id|status    |start_date|end_date  |
++---------+----------+----------+----------+
+|E1       |ACTIVE    |2026-01-01|2026-01-04|
+|E1       |SUSPENDED |2026-01-05|2026-01-06|
+|E1       |ACTIVE    |2026-01-07|2026-01-11|
+|E1       |BLOCKED   |2026-01-12|NULL      |
+|E2       |ACTIVE    |2026-01-01|2026-01-04|
+|E2       |INACTIVE  |2026-01-05|2026-01-08|
+
+🧠 High-Level Hints (minimal)
+
+This is interval logic, not row logic
+
+Think in terms of change points, not dates
+
+Priority resolution must happen before compression
+
+Exploding dates will not scale and is not expected
+
+This problem tests whether you truly understand temporal modeling, precedence resolution, and interval compaction in Spark — not just window syntax.
