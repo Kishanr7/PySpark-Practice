@@ -1,0 +1,63 @@
+📅 Today’s PySpark Question
+🔧 Difficulty Level
+
+Medium
+
+🧩 Problem
+
+Rolling 7‑Day User Activity Count
+
+You are given daily user activity records.
+For each user and each date, compute the rolling count of active days in the last 7 days (inclusive).
+
+Rules:
+
+Use calendar days, not row counts
+
+Missing days imply no activity
+
+Results must be ordered by user_id, then activity_date
+
+🧪 Input DataFrame (Creation Code)
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+
+spark = SparkSession.builder.getOrCreate()
+
+data = [
+    ("U1", "2026-01-01"),
+    ("U1", "2026-01-02"),
+    ("U1", "2026-01-04"),
+    ("U1", "2026-01-08"),
+    ("U2", "2026-01-01"),
+    ("U2", "2026-01-03"),
+    ("U2", "2026-01-04"),
+]
+
+df = (
+    spark.createDataFrame(data, ["user_id", "activity_date"])
+    .withColumn("activity_date", F.to_date("activity_date"))
+)
+
+📤 Expected Output
++-------+-------------+------------------------+
+|user_id|activity_date|active_days_last_7_days |
++-------+-------------+------------------------+
+|U1     |2026-01-01   |1                       |
+|U1     |2026-01-02   |2                       |
+|U1     |2026-01-04   |3                       |
+|U1     |2026-01-08   |2                       |
+|U2     |2026-01-01   |1                       |
+|U2     |2026-01-03   |2                       |
+|U2     |2026-01-04   |3                       |
+
+🧠 Minimal Hints
+
+Think in date ranges, not row windows
+
+Window boundaries should move with the date
+
+Avoid assumptions about continuous data
+
+Clean, bounded problem. No tricks.
+Exactly the kind of question that checks whether someone actually understands time‑based windows in Spark.
