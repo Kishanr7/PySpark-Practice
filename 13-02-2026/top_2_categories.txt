@@ -1,0 +1,76 @@
+🧠 Daily PySpark Question
+🧩 Problem Name: Top 2 Products Per Category by Revenue
+🎯 Difficulty Level: Medium+
+📘 Problem Statement
+
+You are given transaction-level sales data.
+
+Your task:
+
+For each category, compute the top 2 products by total revenue.
+
+Rules:
+
+Revenue = quantity * price
+
+If two products have the same revenue within a category, use product_id ascending as tie-breaker
+
+Output must contain:
+
+category
+
+product_id
+
+total_revenue
+
+rank
+
+Results ordered by:
+
+category
+
+rank
+
+🧪 Input DataFrame (Creation Code)
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+
+spark = SparkSession.builder.getOrCreate()
+
+data = [
+    ("Electronics", "P1", 2, 500.0),
+    ("Electronics", "P2", 1, 1200.0),
+    ("Electronics", "P1", 1, 500.0),
+    ("Electronics", "P3", 5, 100.0),
+
+    ("Clothing", "P4", 3, 50.0),
+    ("Clothing", "P5", 2, 80.0),
+    ("Clothing", "P4", 1, 50.0),
+    ("Clothing", "P6", 4, 40.0),
+]
+
+df = spark.createDataFrame(
+    data,
+    ["category", "product_id", "quantity", "price"]
+)
+
+📤 Expected Output
++-----------+----------+-------------+----+
+|category   |product_id|total_revenue|rank|
++-----------+----------+-------------+----+
+|Clothing   |P5        |160.0        |1   |
+|Clothing   |P4        |200.0        |2   |
+|Electronics|P2        |1200.0       |1   |
+|Electronics|P1        |1500.0       |2   |
+
+🧠 High-Level Hints (Minimal)
+
+First aggregate revenue at (category, product_id) level
+
+Use window ranking partitioned by category
+
+Be careful with deterministic tie-breaking
+
+Filter to top 2 after ranking
+
+No shortcuts. Clean window logic required.
