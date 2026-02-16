@@ -1,0 +1,64 @@
+16-02-2026
+🧩 Problem Name: Top-K Products Per Customer with Revenue Threshold
+🎯 Difficulty: Hard
+📘 Problem Statement
+
+Compute total revenue per (customer_id, product_id)
+
+Keep only customers whose total revenue ≥ 500
+
+For each remaining customer, return top 2 products by revenue
+
+Return:
+
+customer_id
+
+product_id
+
+product_revenue
+
+product_rank
+
+Tie-breaker: product_id ascending
+
+🧪 DataFrame Creation Code
+data = [
+    ("C1", "P1", 100.0),
+    ("C1", "P2", 200.0),
+    ("C1", "P1", 150.0),
+    ("C1", "P3", 50.0),
+
+    ("C2", "P1", 300.0),
+    ("C2", "P2", 100.0),
+
+    ("C3", "P1", 400.0),
+    ("C3", "P2", 200.0),
+    ("C3", "P3", 100.0),
+
+    ("C4", "P1", 100.0),
+]
+
+df = spark.createDataFrame(data, ["customer_id", "product_id", "amount"])
+
+📤 Expected Output
++------------+-----------+---------------+-------------+
+|customer_id |product_id |product_revenue|product_rank |
++------------+-----------+---------------+-------------+
+|C1          |P1         |250.0          |1            |
+|C1          |P2         |200.0          |2            |
+|C3          |P1         |400.0          |1            |
+|C3          |P2         |200.0          |2            |
+
+✅ Status
+
+You are fully caught up till 16-02-2026.
+
+From tomorrow we can:
+
+Continue Hard
+
+Or move to Real Production-style design problems
+
+Or mix SQL + PySpark hybrid interview rounds
+
+Your call.

@@ -1,0 +1,57 @@
+15-02-2026
+🧩 Problem Name: Monthly Reactivation Detection
+🎯 Difficulty: Hard
+📘 Problem Statement
+
+A user is considered reactivated in a month if:
+
+They were active in that month
+
+They were not active in the previous month
+
+Return:
+
+month
+
+reactivated_users_count
+
+Month format: yyyy-MM
+
+🧪 DataFrame Creation Code
+data = [
+    ("U1", "2026-01-05"),
+    ("U1", "2026-03-10"),
+
+    ("U2", "2026-01-15"),
+    ("U2", "2026-02-10"),
+
+    ("U3", "2026-02-01"),
+    ("U3", "2026-04-05"),
+
+    ("U4", "2026-03-20"),
+]
+
+df = (
+    spark.createDataFrame(data, ["user_id", "activity_date"])
+         .withColumn("activity_date", F.to_date("activity_date"))
+)
+
+📤 Expected Output
++--------+-----------------------+
+|month   |reactivated_users_count|
++--------+-----------------------+
+|2026-02 |1                      |
+|2026-03 |1                      |
+|2026-04 |1                      |
+
+🧠 High-Level Hints
+
+Derive month column
+
+Deduplicate user-month combinations
+
+Use lag on month per user
+
+Detect missing previous month
+
+Aggregate per month
